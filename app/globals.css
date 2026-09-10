@@ -90,7 +90,7 @@
     from { height: var(--radix-accordion-content-height); }
     to   { height: 0; }
   }
-  
+
 }
 
 @layer base {
@@ -101,6 +101,8 @@
       radial-gradient(800px 600px at 50% 110%, rgba(254, 240, 138, 0.25), transparent 60%),
       linear-gradient(180deg, #e3f4e9 0%, #dff0ea 55%, #f3efe4 100%);
     background-attachment: fixed;
+
+    scroll-behavior: smooth !important;
   }
 }
 

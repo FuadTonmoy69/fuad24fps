@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import FolderIcon, { type FolderPalette } from "./helpers/FolderIcon";
 import { SectionHeading } from "./Section";
 import { Play } from "lucide-react";
+import { motion } from "motion/react";
 
 function VideoModal({
   open,
@@ -85,35 +86,22 @@ const FOLDERS: {
 /* how many cards show before "See all" — 2 full rows on desktop */
 const INITIAL_COUNT = 6;
 
-/* One delay per card so they land one after another. Written out literally:
-   Tailwind scans source as text, so `[animation-delay:${i * 55}ms]` would
-   compile to nothing. Anything past the list reuses the last delay. */
-const STAGGER = [
-  "",
-  "[animation-delay:55ms]",
-  "[animation-delay:110ms]",
-  "[animation-delay:165ms]",
-  "[animation-delay:220ms]",
-  "[animation-delay:275ms]",
-  "[animation-delay:330ms]",
-  "[animation-delay:385ms]",
-  "[animation-delay:440ms]",
-  "[animation-delay:495ms]",
-  "[animation-delay:550ms]",
-  "[animation-delay:605ms]",
-  "[animation-delay:660ms]",
-  "[animation-delay:715ms]",
-  "[animation-delay:770ms]",
-  "[animation-delay:825ms]",
-  "[animation-delay:880ms]",
-  "[animation-delay:935ms]",
-  "[animation-delay:990ms]",
-  "[animation-delay:1045ms]",
-  "[animation-delay:1100ms]",
-  "[animation-delay:1155ms]",
-  "[animation-delay:1210ms]",
-  "[animation-delay:1265ms]",
-];
+/* Motion computes the offsets, so there's no literal delay array to keep in
+   sync — and no Tailwind scanner problem, since nothing is a class name. */
+const GRID = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.055 } },
+};
+
+const CARD = {
+  hidden: { opacity: 0, y: 26, scale: 0.94 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { type: "spring" as const, stiffness: 420, damping: 22, mass: 0.7 },
+  },
+};
 
 const TAG_STYLES: Record<WorkCat, string> = {
   talking: "bg-emerald-400/20 text-emerald-800",
@@ -157,7 +145,7 @@ export default function Work() {
               key={f.cat}
               onClick={() => pickFilter(f.cat)}
               aria-pressed={active}
-              className={`group flex w-[68px] cursor-pointer shrink-0 flex-col items-center pt-1.5 transition-transform duration-300 ease-[cubic-bezier(.34,1.56,.64,1)] hover:-translate-y-1.5 sm:w-[86px] lg:w-[100px] ${
+              className={`group flex w-[68px] shrink-0 flex-col items-center pt-1.5 transition-transform duration-300 ease-[cubic-bezier(.34,1.56,.64,1)] hover:-translate-y-1.5 sm:w-[86px] lg:w-[100px] ${
                 active ? "-translate-y-[7px]" : ""
               }`}
             >
@@ -192,16 +180,25 @@ export default function Work() {
         ref={gridRef}
         className="scroll-mt-24 rounded-[20px] border-[1.5px] border-white/90 bg-white/70 px-4 py-6 shadow-[0_8px_40px_rgba(0,0,0,.09)] backdrop-blur-lg sm:px-6 sm:py-7"
       >
-        <div
+        {/* key={filter} remounts on every tab switch, which replays the stagger */}
+        <motion.div
           key={filter}
+          variants={GRID}
+          initial="hidden"
+          animate="show"
           className="grid grid-cols-1 gap-4.5 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {shown.map((c, i) => (
+          {shown.map((c) => (
             /* container, not a button — only the play control is clickable,
                and a <button> can't legally nest inside another <button> */
-            <article
+            <motion.article
               key={c.videoId}
-              className={`group animate-bounce-in ${STAGGER[i] ?? STAGGER[STAGGER.length - 1]} overflow-hidden rounded-[18px] border-[1.5px] border-gray-300 bg-white/60 text-left backdrop-blur-md transition duration-200 hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(0,0,0,.13)]`}
+              variants={CARD}
+              /* the lift moves here too — motion writes an inline transform,
+                 which would override a Tailwind hover:-translate-y-1 */
+              whileHover={{ y: -4 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              className="group overflow-hidden rounded-[18px] border-[1.5px] border-gray-300 bg-white/60 text-left backdrop-blur-md transition-shadow duration-200 hover:shadow-[0_16px_40px_rgba(0,0,0,.13)]"
             >
               <div
                 className={`relative w-full overflow-hidden bg-ink ${
@@ -239,9 +236,9 @@ export default function Work() {
                 <h3 className="mb-1.5 text-sm font-extrabold leading-snug text-ink">{c.title}</h3>
                 <p className="text-xs font-semibold leading-relaxed text-neutral-500">{c.desc}</p>
               </div>
-            </article>
+            </motion.article>
           ))}
-        </div>
+        </motion.div>
 
         {hiddenCount > 0 && (
           <div className="mt-7 flex justify-center">
