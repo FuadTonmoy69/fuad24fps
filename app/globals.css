@@ -1,5 +1,6 @@
 @import "tailwindcss";
-
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 
 @theme inline {
@@ -68,6 +69,28 @@
     from { opacity: 0; transform: scale(0.92); }
     to { opacity: 1; transform: scale(1); }
   }
+
+   /* work cards — `backwards` keeps a staggered card invisible until its turn */
+  --animate-bounce-in: bounce-in 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
+
+  /* shadcn Accordion — Radix measures the panel and sets this var at runtime */
+  --animate-accordion-down: accordion-down 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-accordion-up: accordion-up 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+
+  @keyframes bounce-in {
+    0%   { opacity: 0; transform: translateY(26px) scale(0.94); }
+    60%  { opacity: 1; transform: translateY(-6px) scale(1.02); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes accordion-down {
+    from { height: 0; }
+    to   { height: var(--radix-accordion-content-height); }
+  }
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height); }
+    to   { height: 0; }
+  }
+  
 }
 
 @layer base {
@@ -170,4 +193,16 @@
       transform: translateY(calc(-100% - var(--gap)));
     }
   }
+}
+
+
+@utility reveal {
+  animation: reveal-up 1s linear both;
+  animation-timeline: view();
+  animation-range: entry 5% entry 60%;
+}
+
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

@@ -289,16 +289,22 @@ export default function Hero() {
           <div className="animate-bob [animation-delay:2s]">
             <h4 className="mb-2.5 text-[10px] tracking-[.12em] text-amber-800">TOOLS I WORK IN</h4>
             {[
-              ["Pr", "Premiere Pro", "bg-indigo-700"],
-              ["Ae", "After Effects", "bg-violet-600"],
-              ["Dv", "DaVinci Resolve", "bg-blue-700"],
-              ["Cc", "CapCut", "bg-slate-900"],
-              ["F", "Figma", "bg-linear-to-br from-red-500 to-amber-500"],
-            ].map(([abbr, name, bg]) => (
+              // Update the data structure: [Alt Text, Icon Path]
+              ["Premiere Pro", "/icons/premiere.png"],
+              ["After Effects", "/icons/after-effects.png"],
+              ["DaVinci Resolve", "/icons/davinci.png"],
+              ["CapCut", "/icons/capcut.png"],
+              ["Figma", "/icons/figma.png"],
+            ].map(([name, src]) => (
               <div key={name} className="flex items-center gap-2.5 py-1 font-medium text-gray-800">
-                <span className={`grid size-5 place-items-center rounded-md text-[9px] font-extrabold text-white ${bg}`}>
-                  {abbr}
-                </span>
+                <div className="relative size-5 overflow-hidden rounded-sm">
+                  <img
+                    src={src}
+                    alt={`${name} icon`}
+
+                    className="" // Ensures the icon fills the square nicely
+                  />
+                </div>
                 {name}
               </div>
             ))}
@@ -386,8 +392,8 @@ export default function Hero() {
                         key={key}
                         style={isSpace ? { flex: 4 } : undefined}
                         className={`h-[19px] flex-1 rounded-[3px] transition-[background,box-shadow,transform] duration-75 ${lit
-                            ? "translate-y-px bg-linear-to-b from-[#bfe0ff] to-[#8ec5f8] shadow-[0_1px_0_#6ba3d8,0_0_10px_rgba(96,165,250,.7)]"
-                            : "bg-linear-to-b from-[#f4eddd] to-[#e3dac4] shadow-[0_2px_0_#c6bb9f]"
+                          ? "translate-y-px bg-linear-to-b from-[#bfe0ff] to-[#8ec5f8] shadow-[0_1px_0_#6ba3d8,0_0_10px_rgba(96,165,250,.7)]"
+                          : "bg-linear-to-b from-[#f4eddd] to-[#e3dac4] shadow-[0_2px_0_#c6bb9f]"
                           }`}
                       />
                     );
