@@ -1,36 +1,25 @@
-import Header from "@/components/layout/Header";
-import TimelineScrubber from "@/components/layout/TimelineScrubber";
-import Footer from "@/components/layout/Footer";
-import HeroSection from "@/components/sections/HeroSection";
-import WorkSection from "@/components/sections/WorkSection";
-import ServicesSection from "@/components/sections/ServicesSection";
-import ProcessSection from "@/components/sections/ProcessSection";
-import WhySection from "@/components/sections/WhySection";
-import PricingSection from "@/components/sections/PricingSection";
-import TestimonialsSection from "@/components/sections/TestimonialsSection";
-import FaqSection from "@/components/sections/FaqSection";
-import CtaSection from "@/components/sections/CtaSection";
-import ScrollReveal from "@/components/ui/ScrollReveal";
+import About from "@/components/sections/About";
+import Contact from "@/components/sections/Contact";
+import Faq from "@/components/sections/Faq";
+import Hero from "@/components/sections/Hero";
+import Services from "@/components/sections/Services";
+import Testimonials from "@/components/sections/Testimonials";
+import Work from "@/components/sections/Work";
 
-export default function Home() {
+export default function Page() {
   return (
     <>
-      <Header />
-      {/* <TimelineScrubber /> */}
-      <main id="top">
-        <HeroSection />
-        <ScrollReveal>
-          <WorkSection />
-          {/* <ServicesSection /> */}
-          {/* <ProcessSection /> */}
-          {/* <WhySection /> */}
-          {/* <PricingSection />
-          <TestimonialsSection />
-          <FaqSection />
-          <CtaSection /> */}
-        </ScrollReveal>
-      </main>
-      <Footer />
+      {/* <Nav /> */}
+      <Hero />
+      <About />
+      <Work />
+      <Testimonials />
+      <Services />
+      <Faq />
+      <Contact />
+      <footer className="py-8 text-center font-mono text-xs font-bold text-neutral-400">
+        built by FUAD24FPS · 2026 · video editing for creators &amp; brands
+      </footer>
     </>
   );
 }

@@ -1,10 +1,10 @@
 "use client"
 
 import * as React from "react"
+import { cn } from "@/lib/utils"
 import { XIcon } from "lucide-react"
 import { Dialog as DialogPrimitive } from "radix-ui"
 
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
 function Dialog({
@@ -71,10 +71,10 @@ function DialogContent({
           <DialogPrimitive.Close data-slot="dialog-close" asChild>
             <Button
               variant="ghost"
-              className="absolute top-2 right-2 cursor-pointer"
+              className="absolute top-2 right-2"
               size="icon-sm"
             >
-              <XIcon className="size-6" />
+              <XIcon />
               <span className="sr-only">Close</span>
             </Button>
           </DialogPrimitive.Close>

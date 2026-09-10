@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import ScrollToTop from "@/components/ui/ScrollToTop";
-
+import Header from "@/components/layout/Header";
 import "./globals.css";
+import Nav from "@/components/sections/Nav";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -26,6 +27,7 @@ export default function RootLayout({
       <body>
         <div className="grain" aria-hidden="true" />
         <ScrollToTop/>
+        <Nav/>
         {children}
       </body>
     </html>
