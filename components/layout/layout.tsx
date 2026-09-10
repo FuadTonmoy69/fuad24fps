@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Baloo_2, Caveat, DM_Sans, Space_Mono } from "next/font/google";
+import { Baloo_2, Caveat, DM_Sans, Space_Mono,Poppins } from "next/font/google";
 import { SITE } from "@/lib/data";
 import "./globals.css";
 
@@ -12,14 +12,22 @@ const dmSans = DM_Sans({
 
 const baloo = Baloo_2({
   subsets: ["latin"],
-  weight: ["700", "800"],
-  variable: "--font-baloo",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-baloo-src",
   display: "swap",
 });
 
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-poppins-src',
+  display: 'swap',
+});
+
+
 const caveat = Caveat({
   subsets: ["latin"],
-  weight: ["600"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-caveat",
   display: "swap",
 });
@@ -52,9 +60,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${dmSans.variable} ${baloo.variable} ${caveat.variable} ${spaceMono.variable} scroll-smooth`}
+      className={` scroll-smooth`}
     >
-      <body className="min-h-screen overflow-x-hidden font-sans text-ink antialiased">
+      <body className={`${dmSans.variable} ${poppins.variable} ${baloo.variable} ${caveat.variable} ${spaceMono.variable} font-sans min-h-screen overflow-x-hidden text-ink antialiased`}>
         {children}
       </body>
     </html>

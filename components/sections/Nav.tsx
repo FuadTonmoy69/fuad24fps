@@ -47,14 +47,14 @@ export default function Nav() {
       >
         <Link href="#top" className="flex items-center gap-2 font-bold text-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/siteLogo.png" alt={SITE.name} className="w-[120px]" />
+          <img src="/siteLogo.png" alt={SITE.name} className="w-[125px]" />
         </Link>
 
         {links.map((l) => (
           <Link
             key={l.href}
             href={l.href}
-            className="hidden font-display text-sm transition-colors hover:text-white sm:inline"
+            className="hidden font-display text-base transition-colors hover:text-white sm:inline"
           >
             {l.label}
           </Link>

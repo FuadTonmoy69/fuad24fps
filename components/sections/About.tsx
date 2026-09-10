@@ -19,7 +19,7 @@ const profile: ProfileData = {
   role: "Video Editor & Motion Designer",
   description:
     "Crafting high-retention video for creators and brands. Kinetic typography, tight pacing and sound design that keeps viewers hooked. Remote & worldwide.",
-  imageUrl: "/profile.jpeg",
+  imageUrl: "/pic1.jpg",
   videoId: "en-KzDJ2z_g",
   reelLength: "1:24",
 };

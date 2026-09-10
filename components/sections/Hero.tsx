@@ -86,7 +86,7 @@ export default function Hero() {
     }
 
     let tx = 0, ty = 0, cx = 0, cy = 0, frame = 0;
-    let detach = () => {};
+    let detach = () => { };
 
     const loop = () => {
       cx += (tx - cx) * 0.06;
@@ -318,7 +318,7 @@ export default function Hero() {
         <div className="relative z-2 flex flex-col items-center">
           <h1
             aria-label="hello!"
-            className="relative z-5 mb-[-18px] select-none font-display text-[64px] font-extrabold leading-none tracking-[-.02em] md:mb-[-30px] md:text-[92px]"
+            className="relative z-5 mb-[-18px] select-none font-display font-extrabold text-[64px] leading-none tracking-[-.02em] md:mb-[-30px] md:text-[92px]"
           >
             {["h", "e", "l", "l", "o", "!"].map((ch, i) => (
               <span
@@ -343,7 +343,7 @@ export default function Hero() {
                     <i className="size-2 rounded-full bg-[#28c840]" />
                   </span>
                   <b className="absolute left-1/2 -translate-x-1/2 text-[10px] font-medium text-[#9a8f7c]">
-                    -
+                    fuad24fps.com
                   </b>
                 </div>
 
@@ -366,7 +366,7 @@ export default function Hero() {
               </div>
             </div>
             <div className="pb-3 pt-2.5 text-center text-[11px] tracking-[.05em] text-[#8a7c64]">
-              {SITE.handle} — video editing &amp; motion
+
             </div>
           </div>
 
@@ -385,11 +385,10 @@ export default function Hero() {
                       <div
                         key={key}
                         style={isSpace ? { flex: 4 } : undefined}
-                        className={`h-[19px] flex-1 rounded-[3px] transition-[background,box-shadow,transform] duration-75 ${
-                          lit
+                        className={`h-[19px] flex-1 rounded-[3px] transition-[background,box-shadow,transform] duration-75 ${lit
                             ? "translate-y-px bg-linear-to-b from-[#bfe0ff] to-[#8ec5f8] shadow-[0_1px_0_#6ba3d8,0_0_10px_rgba(96,165,250,.7)]"
                             : "bg-linear-to-b from-[#f4eddd] to-[#e3dac4] shadow-[0_2px_0_#c6bb9f]"
-                        }`}
+                          }`}
                       />
                     );
                   })}
@@ -434,9 +433,8 @@ export default function Hero() {
 
       {/* toast */}
       <div
-        className={`pointer-events-none fixed bottom-6 left-1/2 z-99 -translate-x-1/2 rounded-full bg-[#17181d] px-[18px] py-2.5 text-[13px] text-white shadow-[0_12px_30px_rgba(0,0,0,.3)] transition-all duration-300 ${
-          toast ? "translate-y-0 opacity-100" : "translate-y-5 opacity-0"
-        }`}
+        className={`pointer-events-none fixed bottom-6 left-1/2 z-99 -translate-x-1/2 rounded-full bg-[#17181d] px-[18px] py-2.5 text-[13px] text-white shadow-[0_12px_30px_rgba(0,0,0,.3)] transition-all duration-300 ${toast ? "translate-y-0 opacity-100" : "translate-y-5 opacity-0"
+          }`}
       >
         {toast}
       </div>
