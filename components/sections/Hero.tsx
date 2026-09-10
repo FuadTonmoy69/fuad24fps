@@ -181,9 +181,9 @@ export default function Hero() {
   return (
     <main
       ref={sceneRef}
-      className="relative flex min-h-dvh justify-center overflow-x-clip px-6 pb-12 pt-28"
+      className="relative flex min-h-svh justify-center overflow-x-clip px-6 pb-12 pt-28"
     >
-      <div className="relative flex min-h-[calc(100dvh-158px)] w-full max-w-[1140px] flex-col items-center justify-center">
+      <div className="relative flex min-h-[calc(100svh-158px)] w-full max-w-[1140px] flex-col items-center justify-center">
 
         {/* sparkles */}
         <div className="pointer-events-none absolute inset-0 z-1">
@@ -351,7 +351,7 @@ export default function Hero() {
                   <div className="mb-2.5 inline-block rounded-xl rounded-bl-[3px] border border-[#e5ddcb] bg-white px-2.5 py-1.5 text-[13px]">
                     Hey, I&rsquo;m Fuad 👋
                   </div>
-                  <div className="h-12 text-[17px] font-semibold text-gray-900">
+                  <div className="min-h-12 text-[17px] font-semibold text-gray-900">
                     {typed}
                     <span className="inline-block h-[1.05em] w-0.5 animate-caret -mb-0.5 bg-gray-900 align-[-2px]" />
                   </div>
