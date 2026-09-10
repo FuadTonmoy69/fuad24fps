@@ -49,7 +49,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "FUAD24FPS — Video Editing for Creators & Brands",
+  title: "FUAD24FPS - Video Editing for Creators & Brands",
   description:
     "Freelance video editing for YouTube, podcasts, shorts and ad creatives. Footage in, retention out.",
 };

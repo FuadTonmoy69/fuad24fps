@@ -86,20 +86,31 @@ const FOLDERS: {
 /* how many cards show before "See all" — 2 full rows on desktop */
 const INITIAL_COUNT = 6;
 
-/* Motion computes the offsets, so there's no literal delay array to keep in
-   sync — and no Tailwind scanner problem, since nothing is a class name. */
+/* How long the whole reveal should take, start to last card. The per-card
+   gap is derived from this, so 4 cards and 23 cards both finish in about
+   the same time instead of the long list dragging on for two seconds. */
+const REVEAL_SECONDS = 0.85;
+const MAX_GAP = 0.08;
+
 const GRID = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.055 } },
+  show: (count: number) => ({
+    transition: {
+      delayChildren: 0.05,
+      staggerChildren: Math.min(MAX_GAP, REVEAL_SECONDS / Math.max(count, 1)),
+    },
+  }),
 };
 
 const CARD = {
-  hidden: { opacity: 0, y: 26, scale: 0.94 },
+  hidden: { opacity: 0, y: 24, scale: 0.96 },
   show: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { type: "spring" as const, stiffness: 420, damping: 22, mass: 0.7 },
+    /* softer than a snappy spring: lower stiffness and more damping means it
+       glides into place with just a hint of overshoot */
+    transition: { type: "spring" as const, stiffness: 240, damping: 26, mass: 0.9 },
   },
 };
 
@@ -183,6 +194,7 @@ export default function Work() {
         {/* key={filter} remounts on every tab switch, which replays the stagger */}
         <motion.div
           key={filter}
+          custom={shown.length}
           variants={GRID}
           initial="hidden"
           animate="show"
@@ -194,10 +206,13 @@ export default function Work() {
             <motion.article
               key={c.videoId}
               variants={CARD}
-              /* the lift moves here too — motion writes an inline transform,
-                 which would override a Tailwind hover:-translate-y-1 */
-              whileHover={{ y: -4 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              /* the lift lives here too — motion writes an inline transform,
+                 which would override a Tailwind hover:-translate-y-1.
+                 The spring is scoped to the hover so it can't affect entry. */
+              whileHover={{
+                y: -4,
+                transition: { type: "spring", stiffness: 400, damping: 25 },
+              }}
               className="group overflow-hidden rounded-[18px] border-[1.5px] border-gray-300 bg-white/60 text-left backdrop-blur-md transition-shadow duration-200 hover:shadow-[0_16px_40px_rgba(0,0,0,.13)]"
             >
               <div
