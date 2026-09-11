@@ -1,3 +1,6 @@
+"use client";
+
+import { motion, MotionConfig } from "motion/react";
 import { SectionHeading } from "./Section";
 
 const SERVICES = [
@@ -50,56 +53,102 @@ const SERVICES = [
   },
 ];
 
+/* Same curve as the rest of the page, so everything decelerates alike. */
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+/* The delay is set per card from its index rather than by staggerChildren on
+   a parent. Propagation only fires if the child has no initial/animate of its
+   own, which is easy to break by accident — this way each frame owns its own
+   timing and can't silently stop cascading. */
+const FRAME = {
+  hidden: { opacity: 0, y: 30 },
+  show: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: EASE, delay: i * 0.25 },
+  }),
+};
+
+/* the icon tile is the one solid object in each frame, so it gets the spring */
+const TILE = {
+  hidden: { opacity: 0, scale: 0.6, rotate: -12 },
+  show: (i: number) => ({
+    opacity: 1,
+    scale: 1,
+    rotate: 0,
+    transition: {
+      type: "spring" as const,
+      stiffness: 320,
+      damping: 18,
+      mass: 0.7,
+      delay: i * 0.12 + 0.14,
+    },
+  }),
+};
+
 export default function Services() {
   return (
-    <section id="services" className="mx-auto max-w-[1140px] px-8 pb-20">
-      <SectionHeading eyebrow="/ what I do" title="Services" />
+    <MotionConfig reducedMotion="user">
+      <section id="services" className="mx-auto max-w-[1140px] px-8 pb-20">
+        <SectionHeading eyebrow="/ what I do" title="Services" />
 
-      <div className="grid overflow-hidden rounded-[22px] border-[1.5px] border-white/90 bg-white/55 shadow-[0_12px_48px_rgba(0,0,0,.1)] backdrop-blur-lg sm:grid-cols-2 xl:grid-cols-4">
-        {SERVICES.map((s) => (
-          <article
-            key={s.title}
-            style={{ ["--svc" as string]: s.color }}
-            className="sprockets group relative overflow-hidden border-b-[1.5px] border-black/6 px-6.5 pb-7.5 pt-8.5 transition-colors last:border-b-0 hover:bg-white/60 sm:[&:nth-child(-n+2)]:border-b-[1.5px] xl:border-b-0 xl:border-r-[1.5px] xl:last:border-r-0"
-          >
-            <span className="mb-3.5 block font-mono text-[10px] font-bold tracking-[.5px] text-(--svc)">
-              {s.code}
-            </span>
-
-            <span
-              className="mb-4 grid size-11.5 place-items-center rounded-[14px] bg-(--svc) shadow-[0_6px_18px_color-mix(in_srgb,var(--svc)_40%,transparent)] transition-transform duration-300 ease-[cubic-bezier(.34,1.56,.64,1)] group-hover:-rotate-8 group-hover:scale-110"
+        <div
+          className="grid overflow-hidden rounded-[22px] border-[1.5px] border-white/90 bg-white/55 shadow-[0_12px_48px_rgba(0,0,0,.1)] backdrop-blur-lg sm:grid-cols-2 xl:grid-cols-4"
+        >
+          {SERVICES.map((s, i) => (
+            <motion.article
+              key={s.title}
+              variants={FRAME}
+              custom={i}
+              initial="hidden"
+              whileInView="show"
+              /* amount low: the strip is one short row on desktop, so waiting
+                 for a fifth of a frame's height can miss entirely */
+              viewport={{ once: true, amount: 0.15, margin: "0px 0px -40px 0px" }}
+              style={{ ["--svc" as string]: s.color }}
+              className="sprockets group relative overflow-hidden border-b-[1.5px] border-black/6 px-6.5 pb-7.5 pt-8.5 transition-colors last:border-b-0 hover:bg-white/60 sm:[&:nth-child(-n+2)]:border-b-[1.5px] xl:border-b-0 xl:border-r-[1.5px] xl:last:border-r-0"
             >
-              <svg
-                viewBox="0 0 24 24"
-                className="size-5.5"
-                fill="none"
-                stroke="#fff"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                {s.icon}
-              </svg>
-            </span>
+              <span className="mb-3.5 block font-mono text-[10px] font-bold tracking-[.5px] text-(--svc)">
+                {s.code}
+              </span>
 
-            <h3 className="mb-2 text-base font-black tracking-[-.3px] text-ink">{s.title}</h3>
-            <p className="mb-4 text-[12.5px] font-semibold leading-[1.65] text-neutral-500">
-              {s.body}
-            </p>
-
-            <div className="flex flex-wrap gap-1.5">
-              {s.tags.map((t) => (
-                <span
-                  key={t}
-                  className="rounded-full bg-[color-mix(in_srgb,var(--svc)_14%,transparent)] px-2.5 py-0.5 font-mono text-[10px] font-extrabold text-[color-mix(in_srgb,var(--svc)_78%,#000)]"
-                >
-                  {t}
+              {/* the wrapper animates; the tile inside keeps its own hover
+                  transform, which motion's inline transform would override */}
+              <motion.span variants={TILE} custom={i} className="mb-4 block w-fit">
+                <span className="grid size-11.5 place-items-center rounded-[14px] bg-(--svc) shadow-[0_6px_18px_color-mix(in_srgb,var(--svc)_40%,transparent)] transition-transform duration-300 ease-[cubic-bezier(.34,1.56,.64,1)] group-hover:-rotate-8 group-hover:scale-110">
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="size-5.5"
+                    fill="none"
+                    stroke="#fff"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    {s.icon}
+                  </svg>
                 </span>
-              ))}
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
+              </motion.span>
+
+              <h3 className="mb-2 text-base font-black tracking-[-.3px] text-ink">{s.title}</h3>
+              <p className="mb-4 text-[12.5px] font-semibold leading-[1.65] text-neutral-500">
+                {s.body}
+              </p>
+
+              <div className="flex flex-wrap gap-1.5">
+                {s.tags.map((t) => (
+                  <span
+                    key={t}
+                    className="rounded-full bg-[color-mix(in_srgb,var(--svc)_14%,transparent)] px-2.5 py-0.5 font-mono text-[10px] font-extrabold text-[color-mix(in_srgb,var(--svc)_78%,#000)]"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </motion.article>
+          ))}
+        </div>
+      </section>
+    </MotionConfig>
   );
 }

@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import FolderIcon, { type FolderPalette } from "./helpers/FolderIcon";
 import { SectionHeading } from "./Section";
 import { Play } from "lucide-react";
-import { motion } from "motion/react";
+import { motion, MotionConfig } from "motion/react";
 
 function VideoModal({
   open,
@@ -86,32 +86,63 @@ const FOLDERS: {
 /* how many cards show before "See all" — 2 full rows on desktop */
 const INITIAL_COUNT = 6;
 
-/* How long the whole reveal should take, start to last card. The per-card
-   gap is derived from this, so 4 cards and 23 cards both finish in about
-   the same time instead of the long list dragging on for two seconds. */
-const REVEAL_SECONDS = 0.85;
-const MAX_GAP = 0.08;
+/* Each card triggers on its own scroll position instead of the grid firing
+   all of them at once, so the bottom of a 23-card list still animates when
+   you actually reach it. The delay is the column index, which makes each
+   row cascade left-to-right. (3 = the desktop column count; at narrower
+   breakpoints it just reads as slight variation.) */
+/* How many cards are typically on screen at once (3 columns × 2 rows).
+   The delay is index-modulo-this rather than index-modulo-columns: with
+   columns, cards 1/4/7 all landed on delay 0 and appeared together. This
+   gives a genuine one-at-a-time cascade across everything you can see,
+   and resets before the delay grows long enough to feel like lag. */
+/* Same curve as the rest of the page, so everything decelerates alike. */
+const EASE = [0.22, 1, 0.36, 1] as const;
+const VIEWPORT = { once: true, amount: 0.25 } as const;
 
-const GRID = {
-  hidden: {},
-  show: (count: number) => ({
-    transition: {
-      delayChildren: 0.05,
-      staggerChildren: Math.min(MAX_GAP, REVEAL_SECONDS / Math.max(count, 1)),
-    },
-  }),
+const RISE = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
 };
 
-const CARD = {
-  hidden: { opacity: 0, y: 24, scale: 0.96 },
+const PANEL = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
+};
+
+/* Folders are objects, so they get a spring with a little pop. */
+const TABS = {
+  hidden: {},
+  show: { transition: { delayChildren: 0.08, staggerChildren: 0.075 } },
+};
+
+const TAB = {
+  hidden: { opacity: 0, y: 18, scale: 0.88 },
   show: {
     opacity: 1,
     y: 0,
     scale: 1,
-    /* softer than a snappy spring: lower stiffness and more damping means it
-       glides into place with just a hint of overshoot */
-    transition: { type: "spring" as const, stiffness: 240, damping: 26, mass: 0.9 },
+    transition: { type: "spring" as const, stiffness: 300, damping: 22, mass: 0.8 },
   },
+};
+
+const BATCH = 6;
+const STEP = 0.11;
+
+const CARD = {
+  hidden: { opacity: 0, y: 50 },
+  show: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    // scale: 1,
+    transition: {
+      type: "spring" as const,
+      stiffness: 240,
+      damping: 26,
+      mass: 0.9,
+      delay: (i % BATCH) * STEP,
+    },
+  }),
 };
 
 const TAG_STYLES: Record<WorkCat, string> = {
@@ -144,16 +175,26 @@ export default function Work() {
   };
 
   return (
+    <MotionConfig reducedMotion="user">
     <section id="work" className="mx-auto max-w-[1140px] px-5 py-20 sm:px-8">
       <SectionHeading eyebrow="/ selected cuts" title="Recent work" />
 
       {/* folder tabs */}
-      <div className="mb-7 flex flex-row items-start justify-between gap-1.5 sm:justify-start sm:gap-3 lg:gap-4">
+      <motion.div
+        variants={TABS}
+        initial="hidden"
+        whileInView="show"
+        viewport={VIEWPORT}
+        className="mb-7 flex flex-row items-start justify-between gap-1.5 sm:justify-start sm:gap-3 lg:gap-4"
+      >
         {FOLDERS.map((f) => {
           const active = filter === f.cat;
           return (
+            /* the wrapper animates, not the button — the button's lift and
+               active offset are Tailwind transforms, and motion's inline
+               transform would win over both */
+            <motion.div key={f.cat} variants={TAB} className="shrink-0">
             <button
-              key={f.cat}
               onClick={() => pickFilter(f.cat)}
               aria-pressed={active}
               className={`group flex w-[68px] shrink-0 flex-col items-center pt-1.5 transition-transform duration-300 ease-[cubic-bezier(.34,1.56,.64,1)] hover:-translate-y-1.5 sm:w-[86px] lg:w-[100px] ${
@@ -182,30 +223,39 @@ export default function Work() {
                 }`}
               />
             </button>
+            </motion.div>
           );
         })}
-      </div>
+      </motion.div>
 
       {/* grid */}
-      <div
+      <motion.div
         ref={gridRef}
+        variants={PANEL}
+        initial="hidden"
+        whileInView="show"
+        /* a low amount, because this panel is taller than the viewport */
+        viewport={{ once: true, amount: 0.05 }}
         className="scroll-mt-24 rounded-[20px] border-[1.5px] border-white/90 bg-white/70 px-4 py-6 shadow-[0_8px_40px_rgba(0,0,0,.09)] backdrop-blur-lg sm:px-6 sm:py-7"
       >
-        {/* key={filter} remounts on every tab switch, which replays the stagger */}
-        <motion.div
+        {/* key={filter} remounts the cards on a tab switch, so the reveal replays */}
+        <div
           key={filter}
-          custom={shown.length}
-          variants={GRID}
-          initial="hidden"
-          animate="show"
           className="grid grid-cols-1 gap-4.5 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {shown.map((c) => (
+          {shown.map((c, i) => (
             /* container, not a button — only the play control is clickable,
                and a <button> can't legally nest inside another <button> */
             <motion.article
               key={c.videoId}
               variants={CARD}
+              custom={i}
+              initial="hidden"
+              whileInView="show"
+              /* once: true — a reveal that replays every time you scroll back
+                 past it gets annoying fast. amount: 0.2 fires slightly before
+                 the card is fully on screen. */
+              viewport={{ once: true, amount: 0.2 }}
               /* the lift lives here too — motion writes an inline transform,
                  which would override a Tailwind hover:-translate-y-1.
                  The spring is scoped to the hover so it can't affect entry. */
@@ -253,10 +303,17 @@ export default function Work() {
               </div>
             </motion.article>
           ))}
-        </motion.div>
+        </div>
 
         {hiddenCount > 0 && (
-          <div className="mt-7 flex justify-center">
+          /* wrapper again — the button owns hover:scale-105 */
+          <motion.div
+            variants={RISE}
+            initial="hidden"
+            whileInView="show"
+            viewport={VIEWPORT}
+            className="mt-7 flex justify-center"
+          >
             <button
               onClick={() => setExpanded(true)}
               className="group flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-extrabold text-white shadow-[0_8px_24px_-6px_rgba(31,36,48,.5)] transition hover:scale-105"
@@ -279,11 +336,16 @@ export default function Work() {
                 <path d="M6 9l6 6 6-6" />
               </svg>
             </button>
-          </div>
+          </motion.div>
         )}
 
         {expanded && visible.length > INITIAL_COUNT && (
-          <div className="mt-7 flex justify-center">
+          <motion.div
+            variants={RISE}
+            initial="hidden"
+            animate="show"
+            className="mt-7 flex justify-center"
+          >
             <button
               onClick={collapse}
               className="group flex items-center gap-2 rounded-full border-2 border-ink/15 px-6 py-3 text-sm font-extrabold text-ink transition hover:border-ink/40"
@@ -303,9 +365,9 @@ export default function Work() {
                 <path d="M18 15l-6-6-6 6" />
               </svg>
             </button>
-          </div>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
 
       <VideoModal
         open={!!modalVideo}
@@ -314,5 +376,6 @@ export default function Work() {
         title={modalVideo?.title ?? ""}
       />
     </section>
+    </MotionConfig>
   );
 }

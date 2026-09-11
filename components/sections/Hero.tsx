@@ -223,7 +223,7 @@ export default function Hero() {
           <Tape />
           <div className="animate-bob [animation-delay:.4s]">
             <div className="h-[120px] w-[130px] overflow-hidden rounded-sm">
-              <img src="/avatar.jpeg" alt="Fuad" className="size-full object-cover object-top" />
+              <img src="/avatar.jpeg" alt="Fuad" className="size-full object-cover object-top scale-[1.06]" />
             </div>
             <div className="pb-0.5 pt-1 text-center font-hand text-[19px] text-[#3a4150]">
               that&rsquo;s me
